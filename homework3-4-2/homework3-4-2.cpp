@@ -11,6 +11,7 @@ private:
     int bldg, appt;
 
 public:
+
     adress(std::string city, std::string strt, int bldg, int appt)
     {
         this->city = city;
@@ -20,60 +21,41 @@ public:
     }
     adress() {}
 
-    std::string* make_string()
-    {
-        std::string* arr = new std::string[4]();
 
-        arr[0] = this->city;
-        arr[1] = this->strt;
-        arr[2] = std::to_string(this->bldg);
-        arr[3] = std::to_string(this->appt);
-        return arr;
+    std::string make_string()
+    {
+        std::string dot = ", ";
+        return this->city + dot + this->strt + dot + std::to_string(this->bldg) + dot + std::to_string(this->appt);
+    }
+
+    std::string get_city()
+    {
+        return this->city;
     }
 
 };
 
-void sort_2d_arr(std::string** twod_arr, int size)
+void sort_adr(std::string* city_arr, std::string* adr_arr, int N)
 {
-    const char* c[5] = { 
-        twod_arr[0][0].c_str(), 
-        twod_arr[1][0].c_str(),
-        twod_arr[2][0].c_str(), 
-        twod_arr[3][0].c_str(), 
-        twod_arr[4][0].c_str()};
-
-    bool changes = false;
-    do {
-        changes = false;
-        for (int i = size - 1; i > 0; i--) {
-            std::cout << "________________________________" << std::endl;
-            std::cout << c[i] << " " << c[i - 1] << std::endl;
-            std::cout << "________________________________" << std::endl;
-            if (strcmp(c[i],c[i-1]) == -1 )
+    int changes = 1;
+    while (changes != 0) {
+        changes = 0;
+        for (int i = 0; i < N - 1; i++) {
+            if (city_arr[i] > city_arr[i+1])
             {
-                for (int j = 0; j < 4; j++)
-                {
-                    std::string temp = twod_arr[i][j];
-                    twod_arr[i][j] = twod_arr[i - 1][j];
-                    twod_arr[i - 1][j] = temp;
-                }
-                changes = true;
+                //std::cout << city_arr[i] << " > " << city_arr[i + 1] << std::endl;
+                std::string temp = adr_arr[i];
+                std::string temp_c = city_arr[i];
+                adr_arr[i] = adr_arr[i + 1];
+                city_arr[i] = city_arr[i + 1];
+                adr_arr[i + 1] = temp;
+                city_arr[i + 1] = temp_c;
+                changes++;
             }
         }
-    } while (changes);
+    } 
 }
 
-int open_file(std::string path)
-{
-    std::ifstream file_read(path);
-    if (!file_read.is_open())
-    {
-        std::cout << "Can't open input file!" << std::endl;
-        return 1;
-    }
-    std::cout << "File is open" << std::endl;
-    return 0;
-}
 
 int main()
 {
@@ -90,12 +72,8 @@ int main()
     }
     std::cout << "Input file is open" << std::endl;
     file_read >> N;
-    std::string** adr_2d_arr = new std::string*[N]();
-    for (int i = 0; i < 4; i++)
-    {
-        adr_2d_arr[i] = new std::string[format];
-    }
-
+    std::string* adr_arr = new std::string[N]();
+    std::string* city_arr = new std::string[N]();
     for (int i = 0; i < N; i++)
     {
         file_read >> city;
@@ -103,24 +81,11 @@ int main()
         file_read >> bldg;
         file_read >> appt;
         adress adr(city, strt, bldg, appt);
-        adr_2d_arr[i] = adr.make_string();
+        city_arr[i] = adr.get_city();
+        adr_arr[i] = adr.make_string();
     }
 
-    
-    std::cout << adr_2d_arr[0][0] << " " << adr_2d_arr[0][1] << std::endl;
-    std::cout << adr_2d_arr[1][0] << " " << adr_2d_arr[1][1] << std::endl;
-    std::cout << adr_2d_arr[2][0] << " " << adr_2d_arr[2][1] << std::endl;
-    std::cout << adr_2d_arr[3][0] << " " << adr_2d_arr[3][1] << std::endl;
-    std::cout << adr_2d_arr[4][0] << " " << adr_2d_arr[4][1] << std::endl << std::endl;
-
-    sort_2d_arr(adr_2d_arr, N);
-
-    std::cout << adr_2d_arr[0][0] << " " << adr_2d_arr[0][1] << std::endl;
-    std::cout << adr_2d_arr[1][0] << " " << adr_2d_arr[1][1] << std::endl;
-    std::cout << adr_2d_arr[2][0] << " " << adr_2d_arr[2][1] << std::endl;
-    std::cout << adr_2d_arr[3][0] << " " << adr_2d_arr[3][1] << std::endl;
-    std::cout << adr_2d_arr[4][0] << " " << adr_2d_arr[4][1] << std::endl;
-
+    sort_adr(city_arr, adr_arr, N);
 
     file_read.close();
     std::ofstream file_write("out.txt");
@@ -131,20 +96,16 @@ int main()
     }
     std::cout << "Output file is open" << std::endl;
     file_write << N << std::endl;
+
     for (int i = 0; i < N; i++)
     {
-        for (int j = 0; j < 4; j++)
-        {
-            j == 3 ? file_write << adr_2d_arr[i][j] << std::endl : file_write << adr_2d_arr[i][j] << ", ";
-        }
+        file_write << adr_arr[i] << std::endl;
+    }
 
-    }
+    delete[] adr_arr;
+    delete[] city_arr;
+
     file_write.close();
-    for (int i = 0; i < format; i++)
-    {
-        delete[] adr_2d_arr[i];
-    }
-    delete[] adr_2d_arr;
 
     std::cout << "Done!" << std::endl;
 
