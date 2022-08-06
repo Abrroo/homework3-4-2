@@ -35,25 +35,24 @@ public:
 
 };
 
-void sort_adr(std::string* city_arr, std::string* adr_arr, int N)
+void sort_adr(adress** adr_arr, int N)
 {
     int changes = 1;
+    adress** temp = new adress*[N];
     while (changes != 0) {
         changes = 0;
         for (int i = 0; i < N - 1; i++) {
-            if (city_arr[i] > city_arr[i+1])
+            if (adr_arr[i][0].get_city() > adr_arr[i + 1][0].get_city())
             {
-                //std::cout << city_arr[i] << " > " << city_arr[i + 1] << std::endl;
-                std::string temp = adr_arr[i];
-                std::string temp_c = city_arr[i];
+                temp[i] = adr_arr[i];
                 adr_arr[i] = adr_arr[i + 1];
-                city_arr[i] = city_arr[i + 1];
-                adr_arr[i + 1] = temp;
-                city_arr[i + 1] = temp_c;
+                adr_arr[i + 1] = temp[i];
                 changes++;
             }
         }
     } 
+
+    delete[] temp;
 }
 
 
@@ -72,20 +71,20 @@ int main()
     }
     std::cout << "Input file is open" << std::endl;
     file_read >> N;
-    std::string* adr_arr = new std::string[N]();
-    std::string* city_arr = new std::string[N]();
+    adress** adr_arr = new adress*[N]();
+    //std::string* city_arr = new std::string[N]();
     for (int i = 0; i < N; i++)
     {
         file_read >> city;
         file_read >> strt;
         file_read >> bldg;
         file_read >> appt;
-        adress adr(city, strt, bldg, appt);
-        city_arr[i] = adr.get_city();
-        adr_arr[i] = adr.make_string();
+        adr_arr[i] = new adress(city, strt, bldg, appt);
+        //city_arr[i] = adr.get_city();
+        //adr_arr[i] = adr.make_string();
     }
 
-    sort_adr(city_arr, adr_arr, N);
+    sort_adr(adr_arr, N);
 
     file_read.close();
     std::ofstream file_write("out.txt");
@@ -99,14 +98,16 @@ int main()
 
     for (int i = 0; i < N; i++)
     {
-        file_write << adr_arr[i] << std::endl;
+        
+        file_write << adr_arr[i]->make_string() << std::endl;
     }
 
-    delete[] adr_arr;
-    delete[] city_arr;
+
+    //delete[] city_arr;
 
     file_write.close();
 
+    delete[] adr_arr;
     std::cout << "Done!" << std::endl;
 
 }
