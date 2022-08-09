@@ -38,21 +38,19 @@ public:
 void sort_adr(adress** adr_arr, int N)
 {
     int changes = 1;
-    adress** temp = new adress*[N];
+    adress* temp = nullptr;
     while (changes != 0) {
         changes = 0;
         for (int i = 0; i < N - 1; i++) {
-            if (adr_arr[i][0].get_city() > adr_arr[i + 1][0].get_city())
+            if (adr_arr[i]->get_city() > adr_arr[i + 1]->get_city())
             {
-                temp[i] = adr_arr[i];
+                temp = adr_arr[i];
                 adr_arr[i] = adr_arr[i + 1];
-                adr_arr[i + 1] = temp[i];
+                adr_arr[i + 1] = temp;
                 changes++;
             }
         }
     } 
-
-    delete[] temp;
 }
 
 
